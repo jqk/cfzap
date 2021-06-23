@@ -12,5 +12,4 @@ func TestGetLogger(t *testing.T) {
 	}
 
 	logger.Debug("this is a test")
-
 }

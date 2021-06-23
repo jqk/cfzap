@@ -10,11 +10,9 @@ import (
 const defaultFilename = "cfzap"
 
 // readConfigFile reads configuration from specified config file.
-// configFileExt must be lowercase or empty string.
 // It returns config object and nil when success, otherwise nil and error object.
-//func readConfigFile(configFileWithoutExt string, configFileExt string, configPaths ...string) (*viper.Viper, error) {
 func readConfigFile(configOption *ConfigOption) (*viper.Viper, error) {
-	if configOption == nil {
+	if configOption == nil { // using default option if the parameter is nil.
 		configOption = NewConfigOption()
 	}
 
@@ -48,26 +46,16 @@ func readConfigFile(configOption *ConfigOption) (*viper.Viper, error) {
 	return config, nil
 }
 
-// checkConfigType checks provided file extension - configFileExt.
-// configFileExt is case sensitive or is an empty string - using default value,
-// currently is 'json'.
-// it returns config type or error.
-func checkConfigType(configFileExt string) (string, error) {
-	configType := strings.TrimSpace(configFileExt)
+// checkConfigType checks provided file extension.
+// fileExt is case sensitive.
+// it returns config type and error object.
+func checkConfigType(fileExt string) (string, error) {
+	configType := strings.TrimSpace(fileExt)
 
-	if configType != "" && !stringInSlice(configType, viper.SupportedExts) {
-		return "", fmt.Errorf("unsupported Config type [%s]", configFileExt)
+	// when configType is empty string, it will search Viper supported extensions.
+	if configType != "" && !StringInArray(configType, viper.SupportedExts) {
+		return "", fmt.Errorf("unsupported Config type [%s]", fileExt)
 	} else {
 		return configType, nil
 	}
-}
-
-func stringInSlice(value string, list []string) bool {
-	for _, s := range list {
-		if s == value {
-			return true
-		}
-	}
-
-	return false
 }

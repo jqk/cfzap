@@ -15,13 +15,12 @@ import (
 
 // appenderConfig includes config info for creating logger.
 type appenderConfig struct {
-	// zapcore.WriteSyncer used for creating logger.
-	WriteSyncer *zapcore.WriteSyncer
-	// zapcore.Encoder used for creating logger.
-	Encoder *zapcore.Encoder
+	// zapcore.writeSyncer used for creating logger.
+	writeSyncer *zapcore.WriteSyncer
+	// zapcore.encoder used for creating logger.
+	encoder *zapcore.Encoder
 	// the zap.AtomicLevel used for creating logger.
-	LogLevel zap.AtomicLevel
-
+	logLevel zap.AtomicLevel
 	// the name of appender, for debug only.
 	name string
 	// the zapcore.EncoderConfig needed by Encoder.
@@ -132,7 +131,7 @@ func loadAppenderWriteSyncer(config *viper.Viper, appender *appenderConfig, appe
 		syncer = zapcore.AddSync(writer)
 	}
 
-	appender.WriteSyncer = &syncer
+	appender.writeSyncer = &syncer
 
 	return nil
 }
@@ -177,7 +176,7 @@ func loadAppenderEncoder(appender *appenderConfig, appenderSection *viper.Viper)
 		encoder = zapcore.NewJSONEncoder(*appender.encoderConfig)
 	}
 
-	appender.Encoder = &encoder
+	appender.encoder = &encoder
 }
 
 // loadAppenderLogLevel loads log level defined in config file.
@@ -190,7 +189,7 @@ func loadAppenderLogLevel(appender *appenderConfig, appenderSection *viper.Viper
 		atomicLevel.SetLevel(zap.InfoLevel)
 	}
 
-	appender.LogLevel = atomicLevel
+	appender.logLevel = atomicLevel
 }
 
 // loadAppenderEncoderConfig returns zapcore.EncoderConfig defined in config file.

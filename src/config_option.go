@@ -64,3 +64,22 @@ func NewConfigOption(setters ...ConfigPropertySetter) *ConfigOption {
 
 	return option
 }
+
+func (option *ConfigOption) equal(other *ConfigOption) bool {
+	if option == other {
+		return true
+	}
+	if other == nil {
+		return false
+	}
+	if option.CreateNew != other.CreateNew {
+		return false
+	}
+	if option.FileName != other.FileName {
+		return false
+	}
+	if option.FileExt != other.FileExt {
+		return false
+	}
+	return CompareStringArray(option.FilePaths, other.FilePaths)
+}

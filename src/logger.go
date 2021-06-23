@@ -11,6 +11,9 @@ var (
 
 	// default logger in case failed to create logger from config file.
 	defaultLogger *zap.Logger
+
+	// the ConfigOption was used last time.
+	lastConfigOption *ConfigOption
 )
 
 // GetLogger returns a logger according to the config file.
@@ -40,11 +43,10 @@ func GetLogger(configOption *ConfigOption) (*zap.Logger, error) {
 		configOption = NewConfigOption()
 	}
 
-	if !configOption.CreateNew && logger != nil {
+	if !shouldUseCreateNewLogger(configOption) {
 		return logger, nil
 	}
 
-	//config, err := readConfigFile(lastConfigFileWithoutExt, lastConfigFileExit, lastConfigPaths...)
 	config, err := readConfigFile(configOption)
 	if err != nil {
 		defaultLogger.Warn("fail to load logger config: " + err.Error())
@@ -60,7 +62,7 @@ func GetLogger(configOption *ConfigOption) (*zap.Logger, error) {
 	cores := make([]zapcore.Core, len(appenders))
 	i := 0
 	for _, appender := range appenders {
-		cores[i] = zapcore.NewCore(*appender.Encoder, *appender.WriteSyncer, appender.LogLevel)
+		cores[i] = zapcore.NewCore(*appender.encoder, *appender.writeSyncer, appender.logLevel)
 		i++
 	}
 
@@ -76,5 +78,19 @@ func GetLogger(configOption *ConfigOption) (*zap.Logger, error) {
 	core := zapcore.NewTee(cores...)
 	logger = zap.New(core, options...)
 
+	lastConfigOption = configOption
+
 	return logger, nil
+}
+
+// shouldUseCreateNewLogger check to see if we should create a new logger object.
+func shouldUseCreateNewLogger(configOption *ConfigOption) bool {
+	if logger == nil { // we don't have a created logger yet.
+		return true
+	}
+	if configOption.CreateNew { // the option does require create a new one.
+		return true
+	}
+	// we have to create a new one when the new option is diffrent to last one.
+	return !lastConfigOption.equal(configOption)
 }
