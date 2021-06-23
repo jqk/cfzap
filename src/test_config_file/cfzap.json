@@ -1,0 +1,48 @@
+{
+	"options": {
+		"caller": true,
+		"development": true,
+		"fields": {
+			"a": "serviceA",
+			"b": 123
+		}
+	},
+	"appenders": [
+		"appender-stdout",
+		"appender-file "
+	],
+	"appender-stdout": {
+		"encoderType": "console",
+		"logLevel": "Info",
+		"encoderConfig": "encoderConfig",
+		"target": "stdout"
+	},
+	"appender-file": {
+		"encoderType": "json",
+		"logLevel": "Debug",
+		"encoderConfig": "encoderConfig",
+		"target": "lumberjack2"
+	},
+	"lumberjack2": {
+		"filename-comment": "注释",
+		"filename": "E:\\vm_share\\github\\code\\go\\cfzap\\logs\\test.log",
+		"maxsize": 1,
+		"maxage": 10,
+		"maxbackups": 20,
+		"localtime": true,
+		"compress": true
+	},
+	"encoderConfig": {
+		"messageKey": "MSG",
+		"levelKey": "LEVEL",
+		"timeKey": "TIME",
+		"nameKey": "NAME",
+		"callerKey": "CALLER",
+		"functionKey": "FUNC",
+		"stacktraceKey": "STACK",
+		"lineEnding": "\n",
+		"levelEncoder": "capital",
+		"timeEncoder": "ISO8601",
+		"consoleSeparator": " "
+	}
+}

@@ -1,0 +1,9 @@
+---
+# for targetCount == 2 in the test: only two options available in the list.
+# it's excluded from options list if the value set to 'false'.
+options:
+  caller: true
+  development: false
+  fields:
+    a: serviceA
+    b: 123

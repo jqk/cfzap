@@ -1,0 +1,47 @@
+---
+# the 'appenders' is fixed key and cannot be ignored.
+appenders:
+- appender-stdout
+# the blank space around appender name will be trimmed automatically.
+# because there is no section 'appender-file-missing' defined below, 
+# only one appender will be returned.
+- 'appender-file-missing '
+
+# corresponding to appender name defined appenders section.
+appender-stdout:
+  encoderType: console
+  logLevel: Info
+  encoderConfig: encoderConfig
+  target: stdout
+
+# corresponding to appender name defined appenders section.
+appender-file:
+  encoderType: json
+  logLevel: Debug
+  encoderConfig: encoderConfig
+  target: lumberjack2
+
+# corresponding to target defined in appender-file section.
+lumberjack2:
+  filename: ..\logs\test.log
+  maxSize: 1
+  maxAge: 10
+  maxBackups: 20
+  localTime: true
+  compress: true
+
+# corresponding to encoderConfig defined in appender-file and appender-stdout section.
+# different appender can defined different encoderConfig. 
+# for the example, two appenders use same encodeConfig.
+encoderConfig:
+  messageKey: MSG
+  levelKey: LEVEL
+  timeKey: TIME
+  nameKey: NAME
+  callerKey: CALLER
+  functionKey: FUNC
+  stacktraceKey: STACK
+  lineEnding: "\n"
+  levelEncoder: capital
+  timeEncoder: ISO8601
+  consoleSeparator: " "

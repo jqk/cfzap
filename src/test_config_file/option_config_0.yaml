@@ -1,0 +1,4 @@
+---
+# for targetCount == 0 in the test.
+# the 'options' key is optional.
+# so leave it empty for the test. 0 means no options.

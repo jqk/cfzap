@@ -1,0 +1,6 @@
+---
+# for targetCount == 1 in the test: only one option available in the list.
+# it's excluded from options list if the value set to 'false'.
+options:
+  caller: true
+
