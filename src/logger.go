@@ -40,7 +40,8 @@ func GetLogger(createNew bool) (*zap.Logger, error) {
 		return logger, nil
 	}
 
-	config, err := readConfigFile(lastConfigFileWithoutExt, lastConfigFileExit, lastConfigPaths...)
+	//config, err := readConfigFile(lastConfigFileWithoutExt, lastConfigFileExit, lastConfigPaths...)
+	config, err := readConfigFile(nil)
 	if err != nil {
 		defaultLogger.Warn("fail to load logger config: " + err.Error())
 		return defaultLogger, err

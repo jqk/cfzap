@@ -51,8 +51,13 @@ func SetConfigFile(configFileWithoutExt string, configFileExt string, configPath
 // readConfigFile reads configuration from specified config file.
 // configFileExt must be lowercase or empty string.
 // It returns config object and nil when success, otherwise nil and error object.
-func readConfigFile(configFileWithoutExt string, configFileExt string, configPaths ...string) (*viper.Viper, error) {
-	configType, typeErr := checkConfigType(configFileExt)
+//func readConfigFile(configFileWithoutExt string, configFileExt string, configPaths ...string) (*viper.Viper, error) {
+func readConfigFile(configOption *ConfigOption) (*viper.Viper, error) {
+	if configOption == nil {
+		configOption = NewConfigOption()
+	}
+
+	configType, typeErr := checkConfigType(configOption.FileExt)
 	if typeErr != nil {
 		return nil, typeErr
 	}
@@ -60,15 +65,15 @@ func readConfigFile(configFileWithoutExt string, configFileExt string, configPat
 	config := viper.New()
 	config.SetConfigType(configType)
 
-	if s := strings.TrimSpace(configFileWithoutExt); s == "" {
+	if s := strings.TrimSpace(configOption.FileName); s == "" {
 		// using default file name when given value is empty.
 		config.SetConfigName(defaultFilename)
 	} else {
 		config.SetConfigName(s)
 	}
 
-	if len(configPaths) > 0 {
-		for _, p := range configPaths {
+	if len(configOption.FilePaths) > 0 {
+		for _, p := range configOption.FilePaths {
 			config.AddConfigPath(strings.TrimSpace(p))
 		}
 	} else { // using current path when configPaths is empty.
@@ -78,8 +83,6 @@ func readConfigFile(configFileWithoutExt string, configFileExt string, configPat
 	if err := config.ReadInConfig(); err != nil {
 		return nil, err
 	}
-
-	SetConfigFile(configFileWithoutExt, configFileExt, configPaths...)
 
 	return config, nil
 }

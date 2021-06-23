@@ -4,10 +4,12 @@ import (
 	"testing"
 )
 
-const test_config_path = "test_config_file"
-
 func TestLoadAppendersOk(t *testing.T) {
-	config, err := readConfigFile("appender_config_ok", "yaml", test_config_path)
+	option := NewConfigOption(
+		WithFileName("appender_config_ok"),
+		WithFileExt("yaml"),
+		WithFilePaths("test_config_file"))
+	config, err := readConfigFile(option)
 
 	if err != nil {
 		t.Errorf("fail to read appender config: %s" + err.Error())
@@ -25,7 +27,11 @@ func TestLoadAppendersOk(t *testing.T) {
 }
 
 func TestLoadAppendersMissing(t *testing.T) {
-	config, err := readConfigFile("appender_config_missing", "yaml", test_config_path)
+	option := NewConfigOption(
+		WithFileName("appender_config_missing"),
+		WithFileExt("yaml"),
+		WithFilePaths("test_config_file"))
+	config, err := readConfigFile(option)
 
 	if err != nil {
 		t.Errorf("fail to read appender config: %s" + err.Error())

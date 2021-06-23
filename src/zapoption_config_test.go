@@ -13,8 +13,12 @@ func TestLoadLogOptions(t *testing.T) {
 
 func testCase(t *testing.T, targetCount int) {
 	filename := "option_config_" + strconv.Itoa(targetCount)
+	option := NewConfigOption(
+		WithFileName(filename),
+		WithFileExt("yaml"),
+		WithFilePaths("test_config_file"))
 
-	if config, err := readConfigFile(filename, "yaml", "test_config_file"); err != nil {
+	if config, err := readConfigFile(option); err != nil {
 		t.Errorf("fail to read config file %d: %s", targetCount, err)
 	} else {
 		options := loadLogOptions(config)

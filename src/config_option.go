@@ -6,9 +6,14 @@ type ConfigOption struct {
 	CreateNew bool
 	// FileName is the config file name without extension, default is 'cfzap'.
 	FileName string
-	// FileExt is the config file extension, default is 'yaml'.
+	// FileExt is the config file extension, default is empty string.
+	// The supported extensions are:
+	// "json", "toml", "yaml", "yml", "properties", "props", "prop", "hcl", "dotenv", "env" and "ini".
+	// If this field is set to empty string (default), the extensions be searched one by one according to above list.
+	// It's better giving a non empty value to this field if 'FileName' has extension.
 	FileExt string
 	// FilePaths is the path list that the config file may be located.
+	// If this field is nil or empty, current executable path, current path will be used.
 	FilePaths []string
 }
 
@@ -49,7 +54,7 @@ func NewConfigOption(setters ...ConfigPropertySetter) *ConfigOption {
 	option := &ConfigOption{
 		CreateNew: false,
 		FileName:  "cfzap",
-		FileExt:   "yaml",
+		FileExt:   "",
 		FilePaths: []string{"."}}
 
 	// apply settings to properties.
