@@ -7,46 +7,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// last config file information
-var (
-	lastConfigFileWithoutExt string
-	lastConfigFileExit       string
-	lastConfigPaths          []string
-)
-
 const defaultFilename = "cfzap"
-
-// SetConfigFile sets config file information for logger.
-// If don't call this function before calling GetLogger(), it will search current executable path for config file named
-// 'cfzap', the extension is applied one by one below.
-//
-// The supported extensions are:
-// "json", "toml", "yaml", "yml", "properties", "props", "prop", "hcl", "dotenv", "env" and "ini".
-// If 'configFileExt' is empty string, the extensions above will be added to the 'configFileWithoutExit' and searched
-// one by one.
-// It's better don't specify extension for 'configFileWithoutExt'.
-// It's better giving a non empty value to 'configFileExt' if 'configFileWithoutExt' has extension.
-// Default value "cfzap" will be used if 'configFileWithoutExt' is a empty string.
-// If 'configPaths' is empty, it will check current executable path.
-//goland:noinspection GoUnusedExportedFunction
-func SetConfigFile(configFileWithoutExt string, configFileExt string, configPaths ...string) error {
-	configType, typeErr := checkConfigType(configFileExt)
-	if typeErr != nil {
-		return typeErr
-	}
-
-	if s := strings.TrimSpace(configFileWithoutExt); s == "" {
-		// using default file name when given value is empty.
-		lastConfigFileWithoutExt = defaultFilename
-	} else {
-		lastConfigFileWithoutExt = s
-	}
-
-	lastConfigFileExit = configType
-	lastConfigPaths = configPaths
-
-	return nil
-}
 
 // readConfigFile reads configuration from specified config file.
 // configFileExt must be lowercase or empty string.

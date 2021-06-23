@@ -5,7 +5,7 @@ import (
 )
 
 func TestGetLogger(t *testing.T) {
-	logger, err := GetLogger(true)
+	logger, err := GetLogger(nil)
 
 	if err != nil {
 		t.Errorf("fail to get new logger: %v", err)

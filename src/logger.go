@@ -17,7 +17,7 @@ var (
 // If 'createNew' is true, then trying to return the exist logger created before.
 // you can set config file information by calling SetLoggerConfig() before call this function.
 // In theory, even with an error, the returned logger will not be nil.
-func GetLogger(createNew bool) (*zap.Logger, error) {
+func GetLogger(configOption *ConfigOption) (*zap.Logger, error) {
 	// create default logger when there's no configured logger to use.
 	if defaultLogger == nil {
 		var e error
@@ -36,12 +36,16 @@ func GetLogger(createNew bool) (*zap.Logger, error) {
 		}
 	}()
 
-	if !createNew && logger != nil {
+	if configOption == nil {
+		configOption = NewConfigOption()
+	}
+
+	if !configOption.CreateNew && logger != nil {
 		return logger, nil
 	}
 
 	//config, err := readConfigFile(lastConfigFileWithoutExt, lastConfigFileExit, lastConfigPaths...)
-	config, err := readConfigFile(nil)
+	config, err := readConfigFile(configOption)
 	if err != nil {
 		defaultLogger.Warn("fail to load logger config: " + err.Error())
 		return defaultLogger, err
