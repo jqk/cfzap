@@ -39,7 +39,7 @@ func loadAppenders(config *viper.Viper) (map[string]*appenderConfig, map[string]
 
 	appenderNames := config.Get(SECTION_NAME).([]interface{})
 
-	// there is at least one appender.
+	// at least one appender is required.
 	if len(appenderNames) == 0 {
 		return nil, nil, fmt.Errorf("no appender is defined in section [%s]", SECTION_NAME)
 	}
@@ -49,12 +49,13 @@ func loadAppenders(config *viper.Viper) (map[string]*appenderConfig, map[string]
 
 	// load appenders from config file and put them into a map to filter duplication.
 	for _, v := range appenderNames {
-		w := v.(string)
-		appenders[strings.TrimSpace(w)] = nil
+		w := strings.TrimSpace(v.(string))
+		appenders[w] = nil
 	}
 
-	// load each appender info from config file.
-	// if error happened, put it into error appender list.
+	// load each appender info from corresponding section.
+	// the appender name is the section name.
+	// put it into error appender list if error happened.
 	for appenderName := range appenders {
 		if appender, err := loadAppender(config, appenderName); err == nil {
 			appenders[appenderName] = appender
@@ -63,7 +64,7 @@ func loadAppenders(config *viper.Viper) (map[string]*appenderConfig, map[string]
 		}
 	}
 
-	// remove appenders which is failed to load.
+	// remove error appenders.
 	if len(errorAppenders) > 0 {
 		for k := range errorAppenders {
 			delete(appenders, k)
@@ -79,7 +80,7 @@ func loadAppenders(config *viper.Viper) (map[string]*appenderConfig, map[string]
 }
 
 // loadAppender loads each appender according to its name.
-// It returns appenderConfig object and error when the entry was missing.
+// it returns appenderConfig object and error object.
 func loadAppender(config *viper.Viper, appenderName string) (*appenderConfig, error) {
 	appenderSection := config.Sub(appenderName)
 	if appenderSection == nil {
@@ -89,10 +90,10 @@ func loadAppender(config *viper.Viper, appenderName string) (*appenderConfig, er
 	appender := new(appenderConfig)
 	appender.name = appenderName
 
-	if err := loadAppenderEncoderConfig(config, appender, appenderSection, appenderName); err != nil {
+	if err := loadAppenderWriteSyncer(config, appender, appenderSection, appenderName); err != nil {
 		return nil, err
 	}
-	if err := loadAppenderWriteSyncer(config, appender, appenderSection, appenderName); err != nil {
+	if err := loadAppenderEncoderConfig(config, appender, appenderSection, appenderName); err != nil {
 		return nil, err
 	}
 
