@@ -7,8 +7,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-const defaultFilename = "cfzap"
-
 // readConfigFile reads configuration from specified config file.
 // It returns config object and nil when success, otherwise nil and error object.
 func readConfigFile(configOption *ConfigOption) (*viper.Viper, error) {
@@ -26,7 +24,7 @@ func readConfigFile(configOption *ConfigOption) (*viper.Viper, error) {
 
 	if s := strings.TrimSpace(configOption.FileName); s == "" {
 		// using default file name when given value is empty.
-		config.SetConfigName(defaultFilename)
+		config.SetConfigName("cfzap")
 	} else {
 		config.SetConfigName(s)
 	}

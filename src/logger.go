@@ -18,7 +18,6 @@ var (
 
 // GetLogger returns a logger according to the config file.
 // If 'createNew' is true, then trying to return the exist logger created before.
-// you can set config file information by calling SetLoggerConfig() before call this function.
 // In theory, even with an error, the returned logger will not be nil.
 func GetLogger(configOption *ConfigOption) (*zap.Logger, error) {
 	// create default logger when there's no configured logger to use.
@@ -39,11 +38,11 @@ func GetLogger(configOption *ConfigOption) (*zap.Logger, error) {
 		}
 	}()
 
-	if configOption == nil {
+	if configOption == nil { // using default value if it is not provided.
 		configOption = NewConfigOption()
 	}
 
-	if !shouldUseCreateNewLogger(configOption) {
+	if !shouldCreateNewLogger(configOption) {
 		return logger, nil
 	}
 
@@ -83,14 +82,15 @@ func GetLogger(configOption *ConfigOption) (*zap.Logger, error) {
 	return logger, nil
 }
 
-// shouldUseCreateNewLogger check to see if we should create a new logger object.
-func shouldUseCreateNewLogger(configOption *ConfigOption) bool {
+// shouldCreateNewLogger check to see if we should create a new logger object.
+func shouldCreateNewLogger(configOption *ConfigOption) bool {
 	if logger == nil { // we don't have a created logger yet.
 		return true
 	}
 	if configOption.CreateNew { // the option does require create a new one.
 		return true
 	}
-	// we have to create a new one when the new option is diffrent to last one.
+
+	// we have to create a new one when the new option is diffrent compare to the last one.
 	return !lastConfigOption.equal(configOption)
 }

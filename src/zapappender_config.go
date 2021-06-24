@@ -90,10 +90,10 @@ func loadAppender(config *viper.Viper, appenderName string) (*appenderConfig, er
 	appender := new(appenderConfig)
 	appender.name = appenderName
 
-	if err := loadAppenderWriteSyncer(config, appender, appenderSection, appenderName); err != nil {
+	if err := loadAppenderWriteSyncer(config, appenderSection, appender); err != nil {
 		return nil, err
 	}
-	if err := loadAppenderEncoderConfig(config, appender, appenderSection, appenderName); err != nil {
+	if err := loadAppenderEncoderConfig(config, appenderSection, appender); err != nil {
 		return nil, err
 	}
 
@@ -104,10 +104,11 @@ func loadAppender(config *viper.Viper, appenderName string) (*appenderConfig, er
 	return appender, nil
 }
 
-// loadAppenderWriteSyncer loads WriteSyncer from config file.
-// It returns error when the entry was missing.
-func loadAppenderWriteSyncer(config *viper.Viper, appender *appenderConfig, appenderSection *viper.Viper, appenderName string) error {
-	s, err := getRequiredString(appenderSection, appenderName, "target")
+// loadAppenderWriteSyncer loads WriteSyncer from corresponding appender section.
+// it returns error when the entry was missing.
+func loadAppenderWriteSyncer(config *viper.Viper, appenderSection *viper.Viper, appender *appenderConfig) error {
+	// 'target' is the fixed and required key. the value should not be empty.
+	s, err := getRequiredString(appenderSection, appender.name, "target")
 	if err != nil {
 		return err
 	}
@@ -119,17 +120,17 @@ func loadAppenderWriteSyncer(config *viper.Viper, appender *appenderConfig, appe
 	} else if strings.EqualFold(s, "stderr") {
 		syncer = zapcore.AddSync(os.Stderr)
 	} else {
+		// find lumberjack section.
 		section := config.Sub(s)
 		if section == nil {
-			return fmt.Errorf("the value of [%s.target] is [%s], but the entry was missing", appenderName, s)
+			return fmt.Errorf("the value of [%s.target] is [%s], but the entry was missing", appender.name, s)
 		}
 
-		writer, err := loadLumberjack(section)
-		if err != nil {
+		if writer, err := loadLumberjack(section); err != nil {
 			return err
+		} else {
+			syncer = zapcore.AddSync(writer)
 		}
-
-		syncer = zapcore.AddSync(writer)
 	}
 
 	appender.writeSyncer = &syncer
@@ -138,7 +139,7 @@ func loadAppenderWriteSyncer(config *viper.Viper, appender *appenderConfig, appe
 }
 
 // loadLumberjack loads lumberjack.Logger as io.Writer from config file.
-// It returns error when it failed to create log file path.
+// it returns error when it failed to create log file path.
 func loadLumberjack(section *viper.Viper) (*lumberjack.Logger, error) {
 	writer := new(lumberjack.Logger)
 
@@ -158,46 +159,19 @@ func loadLumberjack(section *viper.Viper) (*lumberjack.Logger, error) {
 		return nil, err
 	}
 
-	fn := path.Base(s)
-	writer.Filename = path.Join(dir, fn)
+	filename := path.Base(s)
+	writer.Filename = path.Join(dir, filename)
 
 	return writer, nil
 }
 
-// loadAppenderEncoder loads zapcore.Encoder defined in config file.
-// Default value JSON encoder will be used when error occurs.
-func loadAppenderEncoder(appender *appenderConfig, appenderSection *viper.Viper) {
-	s := strings.ToLower(strings.TrimSpace(appenderSection.GetString("encoderType")))
-	var encoder zapcore.Encoder
-
-	if s == "console" {
-		encoder = zapcore.NewConsoleEncoder(*appender.encoderConfig)
-	} else {
-		// all other values are treated as JSON.
-		encoder = zapcore.NewJSONEncoder(*appender.encoderConfig)
-	}
-
-	appender.encoder = &encoder
-}
-
-// loadAppenderLogLevel loads log level defined in config file.
-// Default value InfoLevel will be used when error occurs.
-func loadAppenderLogLevel(appender *appenderConfig, appenderSection *viper.Viper) {
-	atomicLevel := zap.NewAtomicLevel()
-
-	if atomicLevel.UnmarshalText(getLowerBytes(appenderSection, "logLevel")) != nil {
-		// undefined value treated as InfoLevel.
-		atomicLevel.SetLevel(zap.InfoLevel)
-	}
-
-	appender.logLevel = atomicLevel
-}
-
 // loadAppenderEncoderConfig returns zapcore.EncoderConfig defined in config file.
 // It returns error when encoderConfig entry was missing.
-func loadAppenderEncoderConfig(config *viper.Viper, appender *appenderConfig, appenderSection *viper.Viper, appenderName string) error {
-	// get value of appender encoderConfig first.
-	sectionName, err := getRequiredString(appenderSection, appenderName, "encoderConfig")
+func loadAppenderEncoderConfig(config *viper.Viper, appenderSection *viper.Viper, appender *appenderConfig) error {
+	// get value of appender encoderConfig section name first.
+	// 'encoderConfig' is the fixed and required name defined in appender section.
+	// its value can be any meaningful word, not required as 'encoderConfig'.
+	sectionName, err := getRequiredString(appenderSection, appender.name, "encoderConfig")
 	if err != nil {
 		return err
 	}
@@ -205,12 +179,12 @@ func loadAppenderEncoderConfig(config *viper.Viper, appender *appenderConfig, ap
 	section := config.Sub(sectionName)
 	if section == nil {
 		return fmt.Errorf("the value of [%s.encoderConfig] is [%s], but the entry was missing",
-			appenderName, sectionName)
+			appender.name, sectionName)
 	}
 
 	encoderConfig := new(zapcore.EncoderConfig)
 
-	// deal with string properties.
+	// deal with string properties. all keys are optional.
 	if section.IsSet("callerKey") {
 		encoderConfig.CallerKey = section.GetString("callerKey")
 	}
@@ -261,6 +235,35 @@ func loadAppenderEncoderConfig(config *viper.Viper, appender *appenderConfig, ap
 	appender.encoderConfig = encoderConfig
 
 	return nil
+}
+
+// loadAppenderLogLevel loads log level defined in config file.
+// Default value InfoLevel will be used when error occurs.
+func loadAppenderLogLevel(appender *appenderConfig, appenderSection *viper.Viper) {
+	atomicLevel := zap.NewAtomicLevel()
+
+	if atomicLevel.UnmarshalText(getLowerBytes(appenderSection, "logLevel")) != nil {
+		// undefined value treated as InfoLevel.
+		atomicLevel.SetLevel(zap.InfoLevel)
+	}
+
+	appender.logLevel = atomicLevel
+}
+
+// loadAppenderEncoder loads zapcore.Encoder defined in config file.
+// default value JSON encoder will be used when error occurs.
+func loadAppenderEncoder(appender *appenderConfig, appenderSection *viper.Viper) {
+	s := strings.ToLower(strings.TrimSpace(appenderSection.GetString("encoderType")))
+	var encoder zapcore.Encoder
+
+	if s == "console" {
+		encoder = zapcore.NewConsoleEncoder(*appender.encoderConfig)
+	} else {
+		// all other values are treated as JSON.
+		encoder = zapcore.NewJSONEncoder(*appender.encoderConfig)
+	}
+
+	appender.encoder = &encoder
 }
 
 // getLowerBytes returns a byte array from config.
