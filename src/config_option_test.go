@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestNewCreateLoggerOption(t *testing.T) {
+func TestNewConfigOption(t *testing.T) {
 	option := NewConfigOption()
 
 	if option.FileName != "cfzap" {

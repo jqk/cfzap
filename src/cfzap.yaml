@@ -1,25 +1,52 @@
 ---
+#-------------------------------------------------------------------------------
+# for zapoption
+# see https://pkg.go.dev/go.uber.org/zap#Option
 options:
-  # all the keys below can be ignored.
-  caller: true
-  development: true
-  fields:
-    a: serviceA
-    b: 123
+  # all the keys are optional.
 
+  # configures the Logger to annotate each message with the filename,
+  # line number, and function name of zap's caller.
+  caller: true
+
+  # puts the logger in development mode, which makes DPanic-level
+  # logs panic instead of simply logging an error.
+  development: true
+
+  # adds fields to the Logger. usually we don't need it. here is only an example.
+  # fields:
+  #   a: serviceA
+  #   b: 123
+
+
+#-------------------------------------------------------------------------------    
 # the 'appenders' is fixed key and cannot be ignored.
 appenders:
 - appender-stdout
 # the blank space around appender name will be trimmed automatically.
 - 'appender-file '
 
+
+#-------------------------------------------------------------------------------
 # corresponding to appender name defined appenders section.
+# see https://pkg.go.dev/go.uber.org/zap#Config
 appender-stdout:
+  # see https://pkg.go.dev/go.uber.org/zap@v1.17.0/zapcore#Encoder
+  # can be 'console' or 'json' (default).
   encoderType: console
+
+
   logLevel: Info
+
+  # the section name for zapcore.EncoderConfig
   encoderConfig: encoderConfig
+
+  # used by zapcore.AddSync().
+  # the output target, can be 'stdout', 'stderr' 
+  # or any other string for lumberjack2 section name.
   target: stdout
 
+#-------------------------------------------------------------------------------  
 # corresponding to appender name defined appenders section.
 appender-file:
   encoderType: json
@@ -27,19 +54,50 @@ appender-file:
   encoderConfig: encoderConfig
   target: lumberjack2
 
+
+#-------------------------------------------------------------------------------
 # corresponding to target defined in appender-file section.
 lumberjack2:
-  filename: ..\logs\test.log
+  # filename is the file to write logs to.  Backup log files will be retained
+  # in the same directory.  It uses <processname>-lumberjack.log in
+  # os.TempDir() if empty.
+  filename: logs/test.log
+
+  # maxSize is the maximum size in megabytes of the log file before it gets
+  # rotated. It defaults to 100 megabytes.
   maxSize: 1
+
+  # maxAge is the maximum number of days to retain old log files based on the
+  # timestamp encoded in their filename.  Note that a day is defined as 24
+  # hours and may not exactly correspond to calendar days due to daylight
+  # savings, leap seconds, etc. The default is not to remove old log files
+  # based on age.
   maxAge: 10
+
+  # maxBackups is the maximum number of old log files to retain.  The default
+  # is to retain all old log files (though maxAge may still cause them to get
+  # deleted.)
   maxBackups: 20
+
+  # localTime determines if the time used for formatting the timestamps in
+  # backup files is the computer's local time.  The default is to use UTC
+  # time.
   localTime: true
+
+  # compress determines if the rotated log files should be compressed
+  # using gzip. The default is not to perform compression.
   compress: true
 
+
+#-------------------------------------------------------------------------------
 # corresponding to encoderConfig defined in appender-file and appender-stdout section.
-# different appender can defined different encoderConfig. 
-# for the example, two appenders use same encodeConfig.
+# different appender can define different encoderConfig, but not required.
+# for the example, two appenders use same encodeConfig section, as in this file.
+#
+# see https://pkg.go.dev/go.uber.org/zap@v1.17.0/zapcore#EncoderConfig
 encoderConfig:
+  # set the keys used for each log entry. If any key is empty, that portion
+	# of the entry is omitted.
   messageKey: MSG
   levelKey: LEVEL
   timeKey: TIME
@@ -48,6 +106,12 @@ encoderConfig:
   functionKey: FUNC
   stacktraceKey: STACK
   lineEnding: "\n"
+
+  # configure the primitive representations of common complex types. For
+	# example, some users may want all time.Times serialized as floating-point
+	# seconds since epoch, while others may prefer ISO8601 strings.
   levelEncoder: capital
   timeEncoder: ISO8601
+
+  # configures the field separator used by the console encoder. Defaults to tab.
   consoleSeparator: " "

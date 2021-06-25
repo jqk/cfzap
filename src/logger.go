@@ -1,6 +1,8 @@
 package cfzap
 
 import (
+	"sync"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -14,12 +16,17 @@ var (
 
 	// the ConfigOption was used last time.
 	lastConfigOption *ConfigOption
+
+	lock sync.Mutex
 )
 
 // GetLogger returns a logger according to the config file.
 // If 'createNew' is true, then trying to return the exist logger created before.
 // In theory, even with an error, the returned logger will not be nil.
 func GetLogger(configOption *ConfigOption) (*zap.Logger, error) {
+	lock.Lock()
+	defer lock.Unlock()
+
 	// create default logger when there's no configured logger to use.
 	if defaultLogger == nil {
 		var e error
