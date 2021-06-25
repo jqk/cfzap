@@ -40,6 +40,6 @@ encoderConfig:
   functionKey: FUNC
   stacktraceKey: STACK
   lineEnding: "\n"
-  levelEncoder: capital
-  timeEncoder: ISO8601
+  encodeLevel: capital
+  encodeTime: ISO8601
   consoleSeparator: " "

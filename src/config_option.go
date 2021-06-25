@@ -10,6 +10,7 @@ type ConfigOption struct {
 	// The supported extensions are:
 	// "json", "toml", "yaml", "yml", "properties", "props", "prop", "hcl", "dotenv", "env" and "ini".
 	// If this field is set to empty string (default), the extensions be searched one by one according to above list.
+	// Even you set a value other than 'json', such as 'yaml', it'll load 'json' file if the 'json' file exists.
 	// It's better giving a non empty value to this field if 'FileName' has extension.
 	FileExt string
 	// FilePaths is the path list that the config file may be located.

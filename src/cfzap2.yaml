@@ -61,7 +61,7 @@ lumberjack2:
   # filename is the file to write logs to.  Backup log files will be retained
   # in the same directory.  It uses <processname>-lumberjack.log in
   # os.TempDir() if empty.
-  filename: logs/test.log
+  filename: ../logs/test.log
 
   # maxSize is the maximum size in megabytes of the log file before it gets
   # rotated. It defaults to 100 megabytes.
@@ -96,8 +96,7 @@ lumberjack2:
 #
 # see https://pkg.go.dev/go.uber.org/zap@v1.17.0/zapcore#EncoderConfig
 encoderConfig:
-  # set the keys used for each log entry. If any key is empty, that portion
-	# of the entry is omitted.
+  # set the keys used for each log entry. If any key is empty, that portion of the entry is omitted.
   messageKey: MSG
   levelKey: LEVEL
   timeKey: TIME
@@ -108,10 +107,12 @@ encoderConfig:
   lineEnding: "\n"
 
   # configure the primitive representations of common complex types. For
-	# example, some users may want all time.Times serialized as floating-point
-	# seconds since epoch, while others may prefer ISO8601 strings.
-  levelEncoder: capital
-  timeEncoder: ISO8601
+  # example, some users may want all time.Times serialized as floating-point
+  # seconds since epoch, while others may prefer ISO8601 strings.
+  encodeLevel: capital
+  # can be 'ISO8601' or something like '%2006-01-02 15:04:05.999999999 -0700 MST'.
+  # customized format starts from '%'
+  encodeTime: '%2006-01-02 15:04:05.999'
 
   # configures the field separator used by the console encoder. Defaults to tab.
   consoleSeparator: " "

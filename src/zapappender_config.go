@@ -214,23 +214,31 @@ func loadAppenderEncoderConfig(config *viper.Viper, appenderSection *viper.Viper
 	}
 
 	// deal with typed properties. must use lower case.
-	// no err will be returned so ignore it.
-	_ = encoderConfig.EncodeCaller.UnmarshalText(getLowerBytes(section, "callerEncoder"))
-	_ = encoderConfig.EncodeDuration.UnmarshalText(getLowerBytes(section, "durationEncoder"))
-	_ = encoderConfig.EncodeLevel.UnmarshalText(getLowerBytes(section, "levelEncoder"))
-	_ = encoderConfig.EncodeName.UnmarshalText(getLowerBytes(section, "nameEncoder"))
-
-	s := section.GetString("timeEncoder")
-	if strings.Index(s, "%") == 0 { // customized format starts from '%'
-		s = s[1:]
-		// the format string is like "2006-01-02 15:04:05.999999999 -0700 MST",
-		// use others will get unpredictable value.
-		encoderConfig.EncodeTime = func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
-			enc.AppendString(t.Format(s))
-		}
-	} else {
-		_ = encoderConfig.EncodeTime.UnmarshalText(getLowerBytes(section, "timeEncoder"))
+	if section.IsSet("encodeDuration") {
+		encoderConfig.EncodeDuration.UnmarshalText(getLowerBytes(section, "encodeDuration"))
 	}
+	if section.IsSet("encodeLevel") {
+		encoderConfig.EncodeLevel.UnmarshalText(getLowerBytes(section, "encodeLevel"))
+	}
+	if section.IsSet("encodeName") {
+		encoderConfig.EncodeName.UnmarshalText(getLowerBytes(section, "encodeName"))
+	}
+	if section.IsSet("encodeTime") {
+		s := section.GetString("encodeTime")
+		if strings.Index(s, "%") == 0 { // customized format starts from '%'
+			s = s[1:]
+			// the format string is like "2006-01-02 15:04:05.999999999 -0700 MST",
+			// use others will get unpredictable value.
+			encoderConfig.EncodeTime = func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
+				enc.AppendString(t.Format(s))
+			}
+		} else {
+			_ = encoderConfig.EncodeTime.UnmarshalText(getLowerBytes(section, "encodeTime"))
+		}
+	}
+
+	// no idea why it throws error when we don't set this filed.
+	encoderConfig.EncodeCaller.UnmarshalText(getLowerBytes(section, "encodeCallar"))
 
 	appender.encoderConfig = encoderConfig
 

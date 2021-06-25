@@ -25,7 +25,7 @@
 	},
 	"lumberjack2": {
 		"filename-comment": "注释",
-		"filename": "E:\\vm_share\\github\\code\\go\\cfzap\\logs\\test.log",
+		"filename": "../logs/test.log",
 		"maxSize": 1,
 		"maxAge": 10,
 		"maxBackups": 20,
@@ -41,8 +41,8 @@
 		"functionKey": "FUNC",
 		"stacktraceKey": "STACK",
 		"lineEnding": "\n",
-		"levelEncoder": "capital",
-		"timeEncoder": "ISO8601",
+		"encodeLevel": "capital",
+		"encodeTime": "ISO8601",
 		"consoleSeparator": " "
 	}
 }

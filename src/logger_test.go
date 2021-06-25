@@ -13,7 +13,7 @@ func TestGetLogger(t *testing.T) {
 
 	logger.Debug("this is a test 1")
 
-	configOption := NewConfigOption()
+	configOption := NewConfigOption(WithFileExt("yaml"), WithFileName("cfzap2"))
 	logger, err = GetLogger(configOption)
 
 	if err != nil {
