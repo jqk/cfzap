@@ -2,14 +2,14 @@ package cfzap
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewConfigOption(t *testing.T) {
 	option := NewConfigOption()
 
-	if option.FileName != "cfzap" {
-		t.Error("default file name should be 'cfzap'")
-	}
+	assert.Equalf(t, ConfigFileName, option.FileName, "default file name should be %q", ConfigFileName)
 
 	option = NewConfigOption(
 		WithCreateNew(true),
@@ -17,16 +17,10 @@ func TestNewConfigOption(t *testing.T) {
 		WithFileExt("json"),
 		WithFilePaths("path1", "path2"))
 
-	if !option.CreateNew {
-		t.Error("createNew should be true")
-	}
-	if option.FileName != "abcde" {
-		t.Error("file name should be 'abcde'")
-	}
-	if option.FileExt != "json" {
-		t.Error("file extension should be 'json'")
-	}
-	if len(option.FilePaths) != 2 || option.FilePaths[0] != "path1" || option.FilePaths[1] != "path2" {
-		t.Error("file paths should be 'path1' and 'path2'")
-	}
+	assert.True(t, option.CreateNew, "createNew should be true")
+	assert.Equal(t, "abcde", option.FileName, "file name should be \"abcde\"")
+	assert.Equal(t, "json", option.FileExt, "file extension should be \"json\"")
+	assert.Equal(t, 2, len(option.FilePaths), "there should be 2 paths")
+	assert.Equal(t, "path1", option.FilePaths[0], "FilePaths[0] should be \"path1\"")
+	assert.Equal(t, "path2", option.FilePaths[1], "FilePaths[1] should be \"path2\"")
 }

@@ -18,6 +18,8 @@ type ConfigOption struct {
 	FilePaths []string
 }
 
+const ConfigFileName = "cfzap"
+
 // ConfigPropertySetter defines the function type to change ConfigOption's property.
 type ConfigPropertySetter func(*ConfigOption)
 
@@ -54,7 +56,7 @@ func NewConfigOption(setters ...ConfigPropertySetter) *ConfigOption {
 	// create default value.
 	option := &ConfigOption{
 		CreateNew: false,
-		FileName:  "cfzap",
+		FileName:  ConfigFileName,
 		FileExt:   "",
 		FilePaths: []string{"."}}
 
