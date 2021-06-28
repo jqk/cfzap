@@ -31,17 +31,17 @@ type appenderConfig struct {
 // it returns the successful loaded appender list , failed appender list and error object.
 func loadAppenders(config *viper.Viper) (map[string]*appenderConfig, map[string]error, error) {
 	// 'appenders' is the fixed top level key and cannot be ignored.
-	const SECTION_NAME = "appenders"
+	const SectionName = "appenders"
 
-	if !config.IsSet(SECTION_NAME) {
-		return nil, nil, fmt.Errorf("missing section [%s]", SECTION_NAME)
+	if !config.IsSet(SectionName) {
+		return nil, nil, fmt.Errorf("missing section [%s]", SectionName)
 	}
 
-	appenderNames := config.Get(SECTION_NAME).([]interface{})
+	appenderNames := config.Get(SectionName).([]interface{})
 
 	// at least one appender is required.
 	if len(appenderNames) == 0 {
-		return nil, nil, fmt.Errorf("no appender is defined in section [%s]", SECTION_NAME)
+		return nil, nil, fmt.Errorf("no appender is defined in section [%s]", SectionName)
 	}
 
 	appenders := make(map[string]*appenderConfig)
@@ -215,13 +215,13 @@ func loadAppenderEncoderConfig(config *viper.Viper, appenderSection *viper.Viper
 
 	// deal with typed properties. must use lower case.
 	if section.IsSet("encodeDuration") {
-		encoderConfig.EncodeDuration.UnmarshalText(getLowerBytes(section, "encodeDuration"))
+		_ = encoderConfig.EncodeDuration.UnmarshalText(getLowerBytes(section, "encodeDuration"))
 	}
 	if section.IsSet("encodeLevel") {
-		encoderConfig.EncodeLevel.UnmarshalText(getLowerBytes(section, "encodeLevel"))
+		_ = encoderConfig.EncodeLevel.UnmarshalText(getLowerBytes(section, "encodeLevel"))
 	}
 	if section.IsSet("encodeName") {
-		encoderConfig.EncodeName.UnmarshalText(getLowerBytes(section, "encodeName"))
+		_ = encoderConfig.EncodeName.UnmarshalText(getLowerBytes(section, "encodeName"))
 	}
 	if section.IsSet("encodeTime") {
 		s := section.GetString("encodeTime")
@@ -238,7 +238,7 @@ func loadAppenderEncoderConfig(config *viper.Viper, appenderSection *viper.Viper
 	}
 
 	// no idea why it throws error when we don't set this filed.
-	encoderConfig.EncodeCaller.UnmarshalText(getLowerBytes(section, "encodeCallar"))
+	_ = encoderConfig.EncodeCaller.UnmarshalText(getLowerBytes(section, "encodeCaller"))
 
 	appender.encoderConfig = encoderConfig
 

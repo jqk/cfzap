@@ -10,7 +10,7 @@ import (
 func loadLogOptions(config *viper.Viper) []zap.Option {
 	// 'options' is the fixed top level key. its optional.
 	section := config.Sub("options")
-	options := []zap.Option{}
+	var options []zap.Option
 
 	if section == nil {
 		// return empty option list when there is no 'options' section.

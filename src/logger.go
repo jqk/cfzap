@@ -60,7 +60,7 @@ func GetLogger(configOption *ConfigOption) (*zap.Logger, error) {
 	appenders, errors, err := loadAppenders(config)
 
 	if err != nil {
-		defaultLogger.Sync()
+		_ = defaultLogger.Sync()
 		return defaultLogger, err
 	}
 
@@ -73,15 +73,17 @@ func GetLogger(configOption *ConfigOption) (*zap.Logger, error) {
 
 	for k, v := range errors {
 		defaultLogger.Warn("fail to load appender [" + k + "]: " + v.Error())
-		defaultLogger.Sync()
+		_ = defaultLogger.Sync()
 	}
 
 	if logger != nil { // flush old logger before creating a new one.
 		_ = logger.Sync()
 	}
 
-	// save last configOption.
-	lastConfigOption = configOption
+	// clone and save the new configOption.
+	// the statements below cannot be simplied to 'lastConfigOption = &(*configOption)'.
+	temp := *configOption
+	lastConfigOption = &temp
 
 	// create a new logger.
 	options := loadLogOptions(config)
@@ -100,6 +102,6 @@ func shouldCreateNewLogger(configOption *ConfigOption) bool {
 		return true
 	}
 
-	// we have to create a new one when the new option is diffrent compare to the last one.
+	// we have to create a new one when the new option is different compare to the last one.
 	return !configOption.equal(lastConfigOption)
 }

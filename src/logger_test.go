@@ -25,4 +25,8 @@ func TestGetLogger(t *testing.T) {
 
 	sugarLogger := logger.Sugar()
 	sugarLogger.Info("this is a test 3")
+
+	configOption.FileExt = "ini"
+	_, err = GetLogger(configOption)
+	assert.NotNil(t, err, "there's no config file.")
 }
