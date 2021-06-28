@@ -21,5 +21,5 @@ func TestGetLogger(t *testing.T) {
 	}
 
 	sugarLogger := logger.Sugar()
-	sugarLogger.Debug("this is a test 2")
+	sugarLogger.Info("this is a test 2")
 }

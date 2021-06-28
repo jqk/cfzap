@@ -10,10 +10,6 @@ import (
 // readConfigFile reads configuration from specified config file.
 // It returns config object and nil when success, otherwise nil and error object.
 func readConfigFile(configOption *ConfigOption) (*viper.Viper, error) {
-	if configOption == nil { // using default option if the parameter is nil.
-		configOption = NewConfigOption()
-	}
-
 	configType, typeErr := checkConfigType(configOption.FileExt)
 	if typeErr != nil {
 		return nil, typeErr

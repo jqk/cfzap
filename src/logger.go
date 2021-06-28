@@ -20,30 +20,28 @@ var (
 	lock sync.Mutex
 )
 
+func init() {
+	if defaultLogger == nil {
+		lock.Lock()
+		defer lock.Unlock()
+
+		if defaultLogger == nil {
+			// create default logger when there's no configured logger to use.
+			var e error
+			if defaultLogger, e = zap.NewDevelopment(zap.AddCaller()); e != nil {
+				// such simple code should never go wrong. if it really happens, we have to quit.
+				panic(e)
+			}
+		}
+	}
+}
+
 // GetLogger returns a logger according to the config file.
 // If 'createNew' is true, then trying to return the exist logger created before.
 // In theory, even with an error, the returned logger will not be nil.
 func GetLogger(configOption *ConfigOption) (*zap.Logger, error) {
 	lock.Lock()
 	defer lock.Unlock()
-
-	// create default logger when there's no configured logger to use.
-	if defaultLogger == nil {
-		var e error
-		if defaultLogger, e = zap.NewDevelopment(zap.AddCaller()); e != nil {
-			// such simple code should never go wrong. if it really happens, we have to quit.
-			panic(e)
-		}
-	}
-
-	defer func() {
-		if defaultLogger != nil {
-			_ = defaultLogger.Sync()
-		}
-		if logger != nil {
-			_ = logger.Sync()
-		}
-	}()
 
 	if configOption == nil { // using default value if it is not provided.
 		configOption = NewConfigOption()
@@ -62,6 +60,7 @@ func GetLogger(configOption *ConfigOption) (*zap.Logger, error) {
 	appenders, errors, err := loadAppenders(config)
 
 	if err != nil {
+		defaultLogger.Sync()
 		return defaultLogger, err
 	}
 
@@ -74,17 +73,20 @@ func GetLogger(configOption *ConfigOption) (*zap.Logger, error) {
 
 	for k, v := range errors {
 		defaultLogger.Warn("fail to load appender [" + k + "]: " + v.Error())
+		defaultLogger.Sync()
 	}
 
 	if logger != nil { // flush old logger before creating a new one.
 		_ = logger.Sync()
 	}
 
+	// save last configOption.
+	lastConfigOption = configOption
+
+	// create a new logger.
 	options := loadLogOptions(config)
 	core := zapcore.NewTee(cores...)
 	logger = zap.New(core, options...)
-
-	lastConfigOption = configOption
 
 	return logger, nil
 }
@@ -99,5 +101,5 @@ func shouldCreateNewLogger(configOption *ConfigOption) bool {
 	}
 
 	// we have to create a new one when the new option is diffrent compare to the last one.
-	return !lastConfigOption.equal(configOption)
+	return !configOption.equal(lastConfigOption)
 }
