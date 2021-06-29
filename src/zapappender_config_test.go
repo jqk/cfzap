@@ -41,8 +41,8 @@ func TestAllAppendersFailed(t *testing.T) {
 		WithFileName("appender_config_fail_appenders"),
 		WithFileExt("yaml"),
 		WithFilePaths(testFilePath))
-	config, err := readConfigFile(option)
-	_, _, err = loadAppenders(config)
+	config, _ := readConfigFile(option)
+	_, _, err := loadAppenders(config)
 
 	assert.NotNil(t, err, "there's no appender defined in section appenders.")
 	assert.Equal(t, "fail to load all 2 appenders", err.Error())

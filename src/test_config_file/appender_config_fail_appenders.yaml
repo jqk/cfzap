@@ -17,9 +17,9 @@ appender-stdout:
 appender-file:
   encoderType: json
   logLevel: Debug
+  encoderConfig: encoderConfig
   # wrong key here.
-  encoderConfig2: encoderConfig
-  target: lumberjack2
+  target: lumberjack
 
 # corresponding to target defined in appender-file section.
 lumberjack2:

@@ -18,7 +18,7 @@ func testCase(t *testing.T, targetCount int) {
 	option := NewConfigOption(
 		WithFileName(filename),
 		WithFileExt("yaml"),
-		WithFilePaths("test_config_file"))
+		WithFilePaths(testFilePath))
 
 	config, err := readConfigFile(option)
 	assert.Nilf(t, err, "fail to read config file for target %d", targetCount)
