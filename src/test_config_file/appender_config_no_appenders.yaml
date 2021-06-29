@@ -1,16 +1,16 @@
 ---
 # the 'appenders' is fixed key and cannot be ignored.
-appenders:
-- appender-stdout
+#appenders:
+#- appender-stdout
 # the blank space around appender name will be trimmed automatically.
-- 'appender-file '
+#- 'appender-file '
 
 # corresponding to appender name defined appenders section.
 appender-stdout:
   encoderType: console
   logLevel: Info
   encoderConfig: encoderConfig
-  target: stderr
+  target: stdout
 
 # corresponding to appender name defined appenders section.
 appender-file:

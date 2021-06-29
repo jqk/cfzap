@@ -10,13 +10,15 @@ appender-stdout:
   encoderType: console
   logLevel: Info
   encoderConfig: encoderConfig
-  target: stderr
+  # wrong key here.
+  target2: stdout
 
 # corresponding to appender name defined appenders section.
 appender-file:
   encoderType: json
   logLevel: Debug
-  encoderConfig: encoderConfig
+  # wrong key here.
+  encoderConfig2: encoderConfig
   target: lumberjack2
 
 # corresponding to target defined in appender-file section.

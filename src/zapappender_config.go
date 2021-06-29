@@ -73,7 +73,7 @@ func loadAppenders(config *viper.Viper) (map[string]*appenderConfig, map[string]
 
 	// there should be at least one successful loaded appender.
 	if len(appenders) == 0 {
-		return nil, errorAppenders, fmt.Errorf("failed to load all %d appenders", len(errorAppenders))
+		return nil, errorAppenders, fmt.Errorf("fail to load all %d appenders", len(errorAppenders))
 	}
 
 	return appenders, errorAppenders, nil

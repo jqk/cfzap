@@ -14,8 +14,8 @@ var (
 	// default logger in case failed to create logger from config file.
 	defaultLogger *zap.Logger
 
-	// the ConfigOption was used last time.
-	lastConfigOption *ConfigOption
+	// the ConfigOption was used last time. Note, it is not a pointer.
+	lastConfigOption ConfigOption
 
 	lock sync.Mutex
 )
@@ -81,9 +81,7 @@ func GetLogger(configOption *ConfigOption) (*zap.Logger, error) {
 	}
 
 	// clone and save the new configOption.
-	// the statements below cannot be simplied to 'lastConfigOption = &(*configOption)'.
-	temp := *configOption
-	lastConfigOption = &temp
+	lastConfigOption = *configOption
 
 	// create a new logger.
 	options := loadLogOptions(config)
@@ -103,5 +101,5 @@ func shouldCreateNewLogger(configOption *ConfigOption) bool {
 	}
 
 	// we have to create a new one when the new option is different compare to the last one.
-	return !configOption.equal(lastConfigOption)
+	return !configOption.equal(&lastConfigOption)
 }
